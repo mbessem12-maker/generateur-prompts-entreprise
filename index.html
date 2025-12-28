@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Prompts</title>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
+</head>
+<body>
+    <h1>Générateur de Prompts</h1>
+    <button id="generate">Générer un Prompt</button>
+    <div id="result"></div>
+
+    <script>
+        async function main() {
+            let pyodide = await loadPyodide();
+            await pyodide.loadPackage(["micropip"]);
+            await pyodide.runPythonAsync(`
+                import micropip
+                await micropip.install('https://files.pythonhosted.org/packages/source/r/random2/random2-1.0.1.tar.gz')
+            `);
+
+            document.getElementById("generate").addEventListener("click", async () => {
+                const code = `
+                    import random
+                    base_de_donnees = {
+                        "technologies": ["Intelligence Artificielle", "Blockchain", "Cloud Computing"],
+                        "appels_action": ["Essayez notre démo", "Contactez-nous"]
+                    }
+                    def generer_prompt():
+                        tech = random.choice(base_de_donnees["technologies"])
+                        action = random.choice(base_de_donnees["appels_action"])
+                        return f"Rédige un article sur {tech}. Inclure un appel à l'action : '{action}'."
+                    generer_prompt()
+                `;
+                const result = await pyodide.runPythonAsync(code);
+                document.getElementById("result").innerText = result;
+            });
+        }
+        main();
+    </script>
+</body>
+  </html>
+
+
